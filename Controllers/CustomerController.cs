@@ -80,13 +80,6 @@ namespace PharmaChain.Controllers
                 return RedirectToAction("SearchMedicines");
             }
 
-            // Check quantity limit
-            if (quantity > 30)
-            {
-                TempData["ErrorMessage"] = "For orders over 30 units, please contact the manufacturer directly.";
-                return RedirectToAction("SearchMedicines");
-            }
-
             // Check if any supplier has this medicine in stock
             var availableInventory = await _context.Inventories
                 .Where(i => i.MedicineID == medicineId && i.Quantity >= quantity)
