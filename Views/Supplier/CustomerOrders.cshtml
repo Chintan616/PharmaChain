@@ -1,0 +1,103 @@
+@model IEnumerable<PharmaChain.Models.Order>
+
+@{
+    ViewData["Title"] = "Customer Orders";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Customer Orders</h1>
+    <p class="text-muted">Orders from customers for medicines in your inventory</p>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Medicine</th>
+                <th>Quantity</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Order Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td>@order.OrderID</td>
+                    <td>@order.Customer?.Name</td>
+                    <td>@order.Medicine?.Name</td>
+                    <td>@order.Quantity</td>
+                    <td>@order.TotalAmount.ToString("C")</td>
+                    <td>
+                        <span class="badge bg-@(order.Status switch {
+                            OrderStatus.Pending => "warning",
+                            OrderStatus.Approved => "info",
+                            OrderStatus.Delivered => "success",
+                            OrderStatus.Rejected => "danger",
+                            _ => "secondary"
+                        })">
+                            @switch (order.Status)
+                            {
+                                case OrderStatus.Pending:
+                                    <text>Pending Approval</text>
+                                    break;
+                                case OrderStatus.Approved:
+                                    <text>Approved</text>
+                                    break;
+                                case OrderStatus.Delivered:
+                                    <text>Delivered</text>
+                                    break;
+                                case OrderStatus.Rejected:
+                                    <text>Rejected</text>
+                                    break;
+                                default:
+                                    <text>@order.Status</text>
+                                    break;
+                            }
+                        </span>
+                    </td>
+                    <td>@order.OrderDate.ToString("MM/dd/yyyy")</td>
+                    <td>
+                        @if (order.Status == OrderStatus.Pending)
+                        {
+                            <form asp-action="ApproveOrder" asp-route-orderId="@order.OrderID" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Approve this order and reduce inventory?')">
+                                    <i class="fas fa-check"></i> Approve
+                                </button>
+                            </form>
+                            <form asp-action="RejectOrder" asp-route-orderId="@order.OrderID" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to reject this order?')">
+                                    <i class="fas fa-times"></i> Reject
+                                </button>
+                            </form>
+                        }
+                        else if (order.Status == OrderStatus.Approved)
+                        {
+                            <form asp-action="MarkAsDelivered" asp-route-orderId="@order.OrderID" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-primary" onclick="return confirm('Mark this order as delivered?')">
+                                    <i class="fas fa-truck"></i> Mark as Delivered
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No actions available</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        <h4>No customer orders found</h4>
+        <p>Customers will place orders for medicines that are available in your inventory. Make sure you have medicines in stock by buying from manufacturers.</p>
+    </div>
+}

@@ -1,0 +1,104 @@
+@model PharmaChain.ViewModels.ManufacturerDashboardViewModel
+
+@{
+    ViewData["Title"] = "Manufacturer Dashboard";
+}
+
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Manufacturer Dashboard</h1>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total Users</h5>
+                <h2>@Model.TotalUsers</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total Medicines</h5>
+                <h2>@Model.TotalMedicines</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total Orders</h5>
+                <h2>@Model.TotalOrders</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5 class="card-title">Pending Approvals</h5>
+                <h2>@Model.PendingApprovals</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Orders</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.RecentOrders.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Medicine</th>
+                                    <th>Quantity</th>
+                                    <th>Total Amount</th>
+                                    <th>Status</th>
+                                    <th>Order Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in Model.RecentOrders)
+                                {
+                                    <tr>
+                                        <td>@order.OrderID</td>
+                                        <td>@order.Customer?.Name</td>
+                                        <td>@order.Medicine?.Name</td>
+                                        <td>@order.Quantity</td>
+                                        <td>@order.TotalAmount.ToString("C")</td>
+                                        <td>
+                                            <span class="badge bg-@(order.Status switch {
+                                                OrderStatus.Pending => "warning",
+                                                OrderStatus.Approved => "info",
+                                                OrderStatus.Delivered => "success",
+                                                OrderStatus.Rejected => "danger",
+                                                _ => "secondary"
+                                            })">
+                                                @order.Status
+                                            </span>
+                                        </td>
+                                        <td>@order.OrderDate.ToString("MM/dd/yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">No recent orders found.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

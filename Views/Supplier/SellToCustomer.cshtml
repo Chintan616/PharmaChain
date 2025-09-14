@@ -1,0 +1,51 @@
+@model IEnumerable<PharmaChain.Models.Inventory>
+
+@{
+    ViewData["Title"] = "Sell to Customer";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Sell to Customer</h1>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Medicine Name</th>
+                <th>Batch No</th>
+                <th>Available Quantity</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Medicine?.Name</td>
+                    <td>@item.Medicine?.BatchNo</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.Medicine?.Price.ToString("C")</td>
+                    <td>
+                        @if (item.Quantity > 0)
+                        {
+                            <form asp-action="CreateOrder" method="post" class="d-inline">
+                                <input type="hidden" name="medicineId" value="@item.MedicineID" />
+                                <div class="input-group">
+                                    <input type="number" name="quantity" class="form-control" min="1" max="@item.Quantity" value="1" style="width: 80px;" />
+                                    <input type="email" name="customerEmail" class="form-control" placeholder="Customer Email" style="width: 200px;" required />
+                                    <button type="submit" class="btn btn-success btn-sm">Create Order</button>
+                                </div>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-danger">Out of Stock</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

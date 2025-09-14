@@ -1,0 +1,54 @@
+@model IEnumerable<PharmaChain.Models.Medicine>
+
+@{
+    ViewData["Title"] = "Buy from Manufacturer";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Buy from Manufacturer</h1>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Medicine Name</th>
+                <th>Batch No</th>
+                <th>Expiry Date</th>
+                <th>Available Quantity</th>
+                <th>Price</th>
+                <th>Manufacturer</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var medicine in Model)
+            {
+                <tr>
+                    <td>@medicine.Name</td>
+                    <td>@medicine.BatchNo</td>
+                    <td>@medicine.ExpiryDate.ToString("MM/dd/yyyy")</td>
+                    <td>@medicine.Quantity</td>
+                    <td>@medicine.Price.ToString("C")</td>
+                    <td>@medicine.Manufacturer?.Name</td>
+                    <td>
+                        @if (medicine.Quantity > 0)
+                        {
+                            <form asp-action="PurchaseMedicine" method="post" class="d-inline">
+                                <input type="hidden" name="medicineId" value="@medicine.MedicineID" />
+                                <div class="input-group">
+                                    <input type="number" name="quantity" class="form-control" min="1" max="@medicine.Quantity" value="1" style="width: 80px;" />
+                                    <button type="submit" class="btn btn-primary btn-sm">Purchase</button>
+                                </div>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-danger">Out of Stock</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

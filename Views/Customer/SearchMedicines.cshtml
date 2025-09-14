@@ -1,0 +1,139 @@
+@model PharmaChain.ViewModels.SearchMedicinesViewModel
+
+@{
+    ViewData["Title"] = "Search Medicines";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1>Search Medicines from Suppliers</h1>
+        <p class="text-muted">Browse medicines available from suppliers and place orders</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form asp-action="SearchMedicines" method="get">
+            <div class="input-group">
+                <input asp-for="SearchTerm" class="form-control" placeholder="Search by medicine name or batch number..." />
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Medicines.Any())
+{
+    <div class="row">
+        @foreach (var medicine in Model.Medicines)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@medicine.Name</h5>
+                        <p class="card-text">
+                            <strong>Batch No:</strong> @medicine.BatchNo<br>
+                            <strong>Expiry Date:</strong> @medicine.ExpiryDate.ToString("MM/dd/yyyy")<br>
+                            <strong>Price:</strong> @medicine.Price.ToString("C")<br>
+                            <strong>Manufacturer:</strong> @medicine.Manufacturer?.Name<br>
+                            <strong>Available from:</strong> <span class="text-success">Suppliers</span>
+                        </p>
+                        <form asp-action="PlaceOrder" method="post" class="d-inline" onsubmit="return validateQuantity(this, '@medicine.Name', '@medicine.Manufacturer?.Name')">
+                            <input type="hidden" name="medicineId" value="@medicine.MedicineID" />
+                            <div class="input-group mb-2">
+                                <input type="number" name="quantity" class="form-control" min="1" max="30" value="1" placeholder="Quantity (Max: 30)" />
+                                <button type="submit" class="btn btn-primary">Place Order</button>
+                            </div>
+                        </form>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> 
+                                For orders over 30 units, please contact the manufacturer directly.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <h4>No medicines found</h4>
+        <p>Try adjusting your search criteria or check back later for new medicines.</p>
+    </div>
+}
+
+<!-- Manufacturer Purchase Dialog Modal -->
+<div class="modal fade" id="manufacturerPurchaseModal" tabindex="-1" aria-labelledby="manufacturerPurchaseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="manufacturerPurchaseModalLabel">
+                    <i class="fas fa-industry text-primary"></i> Large Quantity Order
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Quantity Limit Exceeded</strong>
+                </div>
+                <p>You are trying to order <strong id="requestedQuantity"></strong> units of <strong id="medicineName"></strong>.</p>
+                <p>For orders over 30 units, you need to purchase directly from the manufacturer:</p>
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-building"></i> Manufacturer Contact
+                        </h6>
+                        <p class="card-text">
+                            <strong>Company:</strong> <span id="manufacturerName"></span><br>
+                            <strong>Action Required:</strong> Contact manufacturer directly for bulk orders
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-primary" onclick="contactManufacturer()">
+                    <i class="fas fa-phone"></i> Contact Manufacturer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function validateQuantity(form, medicineName, manufacturerName) {
+            const quantityInput = form.querySelector('input[name="quantity"]');
+            const quantity = parseInt(quantityInput.value);
+            
+            if (quantity > 30) {
+                // Show modal dialog
+                document.getElementById('requestedQuantity').textContent = quantity;
+                document.getElementById('medicineName').textContent = medicineName;
+                document.getElementById('manufacturerName').textContent = manufacturerName || 'Manufacturer';
+                
+                const modal = new bootstrap.Modal(document.getElementById('manufacturerPurchaseModal'));
+                modal.show();
+                
+                return false; // Prevent form submission
+            }
+            
+            return true; // Allow form submission
+        }
+        
+        function contactManufacturer() {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('manufacturerPurchaseModal'));
+            modal.hide();
+            
+            // Show contact information or redirect
+            alert('Please contact the manufacturer directly for bulk orders. You can find their contact information in the medicine details.');
+        }
+    </script>
+}

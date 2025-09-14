@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "PharmaChain - Pharmaceutical Supply Chain Management";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to PharmaChain</h1>
+    <p class="lead">A comprehensive pharmaceutical supply chain management system</p>
+    <hr class="my-4">
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">For Manufacturers</h5>
+                    <p class="card-text">Manage medicines, approve users, and track orders across the supply chain.</p>
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-primary">Register as Manufacturer</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">For Suppliers</h5>
+                    <p class="card-text">Buy stock from manufacturers and sell to customers with inventory management.</p>
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-success">Register as Supplier</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">For Customers</h5>
+                    <p class="card-text">Search medicines, place orders, and track your order history.</p>
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-info">Register as Customer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <p>Already have an account? <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary">Login</a></p>
+    </div>
+</div>
