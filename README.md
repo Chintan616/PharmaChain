@@ -9,12 +9,14 @@ PharmaChain is a web-based application designed to streamline pharmaceutical sup
 ## ✨ Features
 
 ### 🔐 Authentication & Authorization
-- **Role-based access control** with three user types:
-  - **Manufacturers**: Create and manage medicines, approve orders
-  - **Suppliers**: Manage inventory, fulfill customer orders
+- **Role-based access control** with four user types:
+  - **Admin**: System administration, user management, global oversight
+  - **Manufacturers**: Create and manage medicines, approve orders, manage related users
+  - **Suppliers**: Manage inventory, fulfill customer orders, buy from manufacturers
   - **Customers**: Browse medicines, place orders, track order status
 - **User approval system** for new registrations
 - **Secure password policies** with validation
+- **Profile management** with role-specific information display
 
 ### 💊 Medicine Management
 - **Medicine catalog** with detailed information:
@@ -37,9 +39,11 @@ PharmaChain is a web-based application designed to streamline pharmaceutical sup
 - **Inventory updates** across the supply chain
 
 ### 🎯 User Dashboards
-- **Customized dashboards** for each user role
+- **Customized dashboards** for each user role with key metrics
 - **Role-specific functionality** and views
 - **Profile management** and user settings
+- **Real-time data visualization** with cards and tables
+- **Low stock alerts** and inventory monitoring
 
 ## 🛠️ Technology Stack
 
@@ -113,23 +117,32 @@ PharmaChain/
 
 ## 👥 User Roles & Permissions
 
+### 👨‍💼 Admin
+- **System administration** and global oversight
+- **User management** across all roles
+- **Medicine management** and catalog oversight
+- **Order management** and system monitoring
+- **Access to all system data** and analytics
+
 ### 🏭 Manufacturer
-- Create and manage medicine listings
-- View and approve customer orders
-- Manage user accounts
-- Track medicine production and distribution
+- **Create and manage medicine listings** with batch tracking
+- **View and approve customer orders** for their medicines
+- **Manage related users** (customers and suppliers who interact with their medicines)
+- **Track medicine production and distribution**
+- **Monitor low stock alerts** and inventory levels
 
 ### 🚚 Supplier
-- Manage inventory levels
-- Fulfill customer orders
-- Buy medicines from manufacturers
-- Track sales and deliveries
+- **Manage inventory levels** and stock tracking
+- **Fulfill customer orders** from available inventory
+- **Buy medicines from manufacturers** to restock
+- **Track sales and deliveries** to customers
+- **Monitor low stock items** and restock alerts
 
 ### 🛒 Customer
-- Browse available medicines
-- Place orders
-- Track order status
-- View order history
+- **Browse available medicines** with search functionality
+- **Place orders** for medicines from suppliers
+- **Track order status** and delivery updates
+- **View order history** and past purchases
 
 ## 🔧 Configuration
 
@@ -154,14 +167,22 @@ Password requirements and authentication settings can be modified in `Program.cs
 2. Configure HTTPS and security settings
 3. Deploy to Azure App Service, IIS, or your preferred hosting platform
 
-## 📝 API Endpoints
+## 📝 Application Structure
 
-The application follows RESTful conventions with the following main controllers:
-- `/Account` - Authentication and user management
-- `/Customer` - Customer-specific operations
-- `/Manufacturer` - Manufacturer operations
-- `/Supplier` - Supplier operations
+The application follows MVC architecture with the following main controllers:
+- `/Account` - Authentication, registration, and profile management
+- `/Admin` - System administration and global management
+- `/Customer` - Customer-specific operations and medicine browsing
+- `/Manufacturer` - Medicine creation, order management, and user oversight
+- `/Supplier` - Inventory management, order fulfillment, and purchasing
 - `/Home` - Landing page and general information
+
+### Key Features by Controller:
+- **AccountController**: Login, registration, profile management, user authentication
+- **AdminController**: User management, medicine oversight, order monitoring
+- **ManufacturerController**: Medicine CRUD, order approval, related user management
+- **SupplierController**: Inventory management, order fulfillment, manufacturer purchasing
+- **CustomerController**: Medicine search, order placement, order tracking
 
 ## 🔒 Security Features
 
@@ -187,14 +208,35 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 For support and questions, please contact the development team or create an issue in the repository.
 
+## 🎯 Recent Updates
+
+### Version 1.0 - Current Release
+- ✅ **Complete role-based system** with Admin, Manufacturer, Supplier, and Customer roles
+- ✅ **Streamlined user management** with role-specific user filtering
+- ✅ **Enhanced dashboards** with real-time metrics and alerts
+- ✅ **Profile management** with role-appropriate information display
+- ✅ **Inventory tracking** with low stock monitoring
+- ✅ **Order management** with complete lifecycle tracking
+- ✅ **Clean, production-ready codebase** with no debugging artifacts
+
+### Key Improvements Made:
+- Removed redundant display name fields in favor of company name
+- Streamlined navigation by removing duplicate links
+- Enhanced manufacturer user management to show only relevant users
+- Improved dashboard layouts with better responsive design
+- Cleaned up statistics functionality for better focus
+- Optimized user experience with role-specific interfaces
+
 ## 🔮 Future Enhancements
 
-- [ ] Real-time notifications
-- [ ] Mobile application
-- [ ] Advanced reporting and analytics
+- [ ] Real-time notifications and alerts
+- [ ] Mobile application for on-the-go management
+- [ ] Advanced reporting and analytics dashboard
 - [ ] Integration with external pharmacy systems
 - [ ] Barcode scanning for medicine tracking
 - [ ] API for third-party integrations
+- [ ] Email notifications for order status updates
+- [ ] Advanced search and filtering capabilities
 
 ---
 
