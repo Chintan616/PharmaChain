@@ -21,5 +21,10 @@ namespace PharmaChain.Models
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        
+        // Low stock threshold for suppliers
+        public const int LOW_STOCK_THRESHOLD = 5;
+        
+        public bool IsLowStock => Quantity <= LOW_STOCK_THRESHOLD;
     }
 }

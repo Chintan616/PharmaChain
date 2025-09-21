@@ -50,18 +50,19 @@ namespace PharmaChain.Controllers
             var medicines = await _context.Inventories
                 .Where(i => i.Quantity > 0)
                 .Include(i => i.Medicine)
-                .ThenInclude(m => m.Manufacturer)
+                .ThenInclude(m => m!.Manufacturer)
                 .Where(i => string.IsNullOrEmpty(searchTerm) || 
-                           i.Medicine.Name.Contains(searchTerm) || 
-                           i.Medicine.BatchNo.Contains(searchTerm))
+                           (i.Medicine != null && i.Medicine.Name.Contains(searchTerm)) || 
+                           (i.Medicine != null && i.Medicine.BatchNo.Contains(searchTerm)))
                 .Select(i => i.Medicine)
+                .Where(m => m != null)
                 .Distinct()
                 .ToListAsync();
 
             var model = new SearchMedicinesViewModel
             {
                 SearchTerm = searchTerm,
-                Medicines = medicines
+                Medicines = medicines!
             };
 
             return View(model);

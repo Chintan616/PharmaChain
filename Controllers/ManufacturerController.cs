@@ -23,14 +23,19 @@ namespace PharmaChain.Controllers
 
             var dashboardData = new ManufacturerDashboardViewModel
             {
-                TotalUsers = await _context.Users.CountAsync(),
                 TotalMedicines = await _context.Medicines.CountAsync(),
                 TotalOrders = await _context.Orders.CountAsync(),
                 PendingApprovals = await _context.Users.CountAsync(u => !u.IsApproved),
+                LowStockMedicines = await _context.Medicines.CountAsync(m => m.Quantity <= Medicine.LOW_STOCK_THRESHOLD),
                 RecentOrders = await _context.Orders
                     .Include(o => o.Customer)
                     .Include(o => o.Medicine)
                     .OrderByDescending(o => o.OrderDate)
+                    .Take(5)
+                    .ToListAsync(),
+                LowStockItems = await _context.Medicines
+                    .Where(m => m.Quantity <= Medicine.LOW_STOCK_THRESHOLD)
+                    .OrderBy(m => m.Quantity)
                     .Take(5)
                     .ToListAsync()
             };
@@ -41,13 +46,51 @@ namespace PharmaChain.Controllers
         // User Management
         public async Task<IActionResult> Users()
         {
-            var users = await _context.Users.ToListAsync();
+            var currentUser = await GetCurrentUserAsync();
+            if (currentUser == null) return NotFound();
+
+            // Get customers who have ordered medicines from this manufacturer
+            var customerIds = await _context.Orders
+                .Where(o => o.Medicine.ManufacturerID == currentUser.Id)
+                .Select(o => o.CustomerID)
+                .Distinct()
+                .ToListAsync();
+
+            // Get suppliers who have inventory of medicines from this manufacturer
+            var supplierIds = await _context.Inventories
+                .Where(i => i.Medicine.ManufacturerID == currentUser.Id)
+                .Select(i => i.UserID)
+                .Distinct()
+                .ToListAsync();
+
+            // Combine both lists and get unique users
+            var allRelevantUserIds = customerIds.Union(supplierIds).ToList();
+
+            // Get users who are either customers or suppliers and are relevant to this manufacturer
+            var users = await _context.Users
+                .Where(u => allRelevantUserIds.Contains(u.Id) && 
+                           (u.Role == "Customer" || u.Role == "Supplier"))
+                .OrderBy(u => u.Role)
+                .ThenBy(u => u.CreatedAt)
+                .ToListAsync();
+
             return View(users);
         }
 
         [HttpPost]
         public async Task<IActionResult> ApproveUser(string userId)
         {
+            var currentUser = await GetCurrentUserAsync();
+            if (currentUser == null) return NotFound();
+
+            // Verify the user is related to this manufacturer's business
+            var isRelatedUser = await IsUserRelatedToManufacturer(userId, currentUser.Id);
+            if (!isRelatedUser)
+            {
+                TempData["ErrorMessage"] = "You can only manage users related to your medicines.";
+                return RedirectToAction("Users");
+            }
+
             var user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
@@ -61,6 +104,17 @@ namespace PharmaChain.Controllers
         [HttpPost]
         public async Task<IActionResult> RejectUser(string userId)
         {
+            var currentUser = await GetCurrentUserAsync();
+            if (currentUser == null) return NotFound();
+
+            // Verify the user is related to this manufacturer's business
+            var isRelatedUser = await IsUserRelatedToManufacturer(userId, currentUser.Id);
+            if (!isRelatedUser)
+            {
+                TempData["ErrorMessage"] = "You can only manage users related to your medicines.";
+                return RedirectToAction("Users");
+            }
+
             var user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
@@ -68,6 +122,19 @@ namespace PharmaChain.Controllers
                 TempData["SuccessMessage"] = "User rejected and deleted.";
             }
             return RedirectToAction("Users");
+        }
+
+        private async Task<bool> IsUserRelatedToManufacturer(string userId, string manufacturerId)
+        {
+            // Check if user is a customer who ordered medicines from this manufacturer
+            var isCustomer = await _context.Orders
+                .AnyAsync(o => o.CustomerID == userId && o.Medicine.ManufacturerID == manufacturerId);
+
+            // Check if user is a supplier who has inventory of medicines from this manufacturer
+            var isSupplier = await _context.Inventories
+                .AnyAsync(i => i.UserID == userId && i.Medicine.ManufacturerID == manufacturerId);
+
+            return isCustomer || isSupplier;
         }
 
         // Medicine Management

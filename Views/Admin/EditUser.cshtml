@@ -1,0 +1,117 @@
+@model PharmaChain.ViewModels.EditUserViewModel
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-user-edit"></i> Edit User
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">User Information</h6>
+                </div>
+                <div class="card-body">
+                    <form asp-action="EditUser" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="CreatedAt" />
+                        
+                        @if (Model.Role == "Customer")
+                        {
+                            <div class="form-group mb-3">
+                                <label asp-for="Name" class="form-label">Name</label>
+                                <input asp-for="Name" class="form-control" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="form-group mb-3">
+                                <label asp-for="CompanyName" class="form-label">Company Name</label>
+                                <input asp-for="CompanyName" class="form-control" placeholder="Enter company name" />
+                                <span asp-validation-for="CompanyName" class="text-danger"></span>
+                            </div>
+                        }
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Role" class="form-label">Role</label>
+                            <select asp-for="Role" class="form-control">
+                                @foreach (var role in Model.AvailableRoles)
+                                {
+                                    <option value="@role">@role</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="IsApproved" class="form-check-input" />
+                                <label asp-for="IsApproved" class="form-check-label">
+                                    Approved
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Account Created</label>
+                            <input type="text" class="form-control" value="@Model.CreatedAt.ToString("MMM dd, yyyy HH:mm")" readonly />
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update User
+                            </button>
+                            <a asp-action="Users" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Users
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Role Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-primary">Admin</h6>
+                        <p class="text-muted small">Full system access, can manage all users, medicines, and orders.</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-success">Manufacturer</h6>
+                        <p class="text-muted small">Can create medicines, manage orders, and approve suppliers/customers.</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-info">Supplier</h6>
+                        <p class="text-muted small">Can manage inventory, buy from manufacturers, and sell to customers.</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-warning">Customer</h6>
+                        <p class="text-muted small">Can search medicines, place orders, and view order history.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -4,10 +4,13 @@ namespace PharmaChain.ViewModels
 {
     public class EditProfileViewModel
     {
-        [Required]
         [StringLength(100)]
         [Display(Name = "Full Name")]
-        public string Name { get; set; } = string.Empty;
+        public string? Name { get; set; }
+
+        [StringLength(200)]
+        [Display(Name = "Company Name")]
+        public string? CompanyName { get; set; }
 
         [Required]
         [EmailAddress]

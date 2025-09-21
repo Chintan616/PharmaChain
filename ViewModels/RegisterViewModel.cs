@@ -4,10 +4,13 @@ namespace PharmaChain.ViewModels
 {
     public class RegisterViewModel
     {
-        [Required]
         [StringLength(100)]
         [Display(Name = "Full Name")]
-        public string Name { get; set; } = string.Empty;
+        public string? Name { get; set; }
+
+        [StringLength(200)]
+        [Display(Name = "Company Name")]
+        public string? CompanyName { get; set; }
 
         [Required]
         [EmailAddress]
@@ -28,5 +31,7 @@ namespace PharmaChain.ViewModels
         [Required]
         [Display(Name = "Role")]
         public string Role { get; set; } = string.Empty;
+
+        public List<string> AvailableRoles { get; set; } = new() { "Admin", "Manufacturer", "Supplier", "Customer" };
     }
 }

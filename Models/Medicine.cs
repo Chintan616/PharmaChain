@@ -32,5 +32,10 @@ namespace PharmaChain.Models
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        
+        // Low stock threshold - consider stock low when quantity is below this
+        public const int LOW_STOCK_THRESHOLD = 10;
+        
+        public bool IsLowStock => Quantity <= LOW_STOCK_THRESHOLD;
     }
 }

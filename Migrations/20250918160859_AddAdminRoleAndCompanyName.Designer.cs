@@ -12,8 +12,8 @@ using PharmaChain.Data;
 namespace PharmaChain.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250914110424_FixDecimalPrecision")]
-    partial class FixDecimalPrecision
+    [Migration("20250918160859_AddAdminRoleAndCompanyName")]
+    partial class AddAdminRoleAndCompanyName
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -165,6 +165,9 @@ namespace PharmaChain.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
+
+                    b.Property<string>("CompanyName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()

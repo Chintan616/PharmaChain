@@ -16,16 +16,28 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label asp-for="Name" class="form-label fw-bold"></label>
-                            <p class="form-control-plaintext">@Model.Name</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
                             <label asp-for="Email" class="form-label fw-bold"></label>
                             <p class="form-control-plaintext">@Model.Email</p>
                         </div>
                     </div>
+                    @if (Model.Role == "Customer" && !string.IsNullOrEmpty(Model.Name))
+                    {
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label fw-bold"></label>
+                                <p class="form-control-plaintext">@Model.Name</p>
+                            </div>
+                        </div>
+                    }
+                    @if (Model.Role != "Customer" && !string.IsNullOrEmpty(Model.CompanyName))
+                    {
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="CompanyName" class="form-label fw-bold"></label>
+                                <p class="form-control-plaintext">@Model.CompanyName</p>
+                            </div>
+                        </div>
+                    }
                 </div>
                 
                 <div class="row">

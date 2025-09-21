@@ -12,7 +12,7 @@ using PharmaChain.Data;
 namespace PharmaChain.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250914110415_InitialCreate")]
+    [Migration("20250914132820_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -300,6 +300,7 @@ namespace PharmaChain.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Quantity")
@@ -349,6 +350,7 @@ namespace PharmaChain.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("OrderID");

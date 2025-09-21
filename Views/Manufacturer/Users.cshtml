@@ -6,6 +6,9 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>User Management</h1>
+    <div class="text-muted">
+        <small>Showing customers and suppliers related to your medicines</small>
+    </div>
 </div>
 
 <div class="table-responsive">
@@ -21,46 +24,57 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var user in Model)
+            @if (Model.Any())
+            {
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.DisplayName</td>
+                        <td>@user.Email</td>
+                        <td>
+                            <span class="badge bg-@(user.Role switch {
+                                "Supplier" => "success",
+                                "Customer" => "info",
+                                _ => "secondary"
+                            })">
+                                @user.Role
+                            </span>
+                        </td>
+                        <td>
+                            @if (user.IsApproved)
+                            {
+                                <span class="badge bg-success">Approved</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">Pending</span>
+                            }
+                        </td>
+                        <td>@user.CreatedAt.ToString("MM/dd/yyyy")</td>
+                        <td>
+                            @if (!user.IsApproved)
+                            {
+                                <form asp-action="ApproveUser" asp-route-userId="@user.Id" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                </form>
+                                <form asp-action="RejectUser" asp-route-userId="@user.Id" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to reject this user?')">Reject</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="text-muted">No actions available</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td>@user.Name</td>
-                    <td>@user.Email</td>
-                    <td>
-                        <span class="badge bg-@(user.Role switch {
-                            "Manufacturer" => "primary",
-                            "Supplier" => "success",
-                            "Customer" => "info",
-                            _ => "secondary"
-                        })">
-                            @user.Role
-                        </span>
-                    </td>
-                    <td>
-                        @if (user.IsApproved)
-                        {
-                            <span class="badge bg-success">Approved</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-warning">Pending</span>
-                        }
-                    </td>
-                    <td>@user.CreatedAt.ToString("MM/dd/yyyy")</td>
-                    <td>
-                        @if (!user.IsApproved)
-                        {
-                            <form asp-action="ApproveUser" asp-route-userId="@user.Id" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-success">Approve</button>
-                            </form>
-                            <form asp-action="RejectUser" asp-route-userId="@user.Id" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to reject this user?')">Reject</button>
-                            </form>
-                        }
-                        else
-                        {
-                            <span class="text-muted">No actions available</span>
-                        }
+                    <td colspan="6" class="text-center text-muted py-4">
+                        <i class="fas fa-users fa-2x mb-2"></i><br>
+                        No customers or suppliers found related to your medicines yet.
                     </td>
                 </tr>
             }

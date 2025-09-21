@@ -24,11 +24,19 @@
         <tbody>
             @foreach (var item in Model)
             {
-                <tr>
+                <tr class="@(item.IsLowStock ? (item.Quantity <= 2 ? "table-danger" : "table-warning") : "")">
                     <td>@item.Medicine?.Name</td>
                     <td>@item.Medicine?.BatchNo</td>
                     <td>@item.Medicine?.ExpiryDate.ToString("MM/dd/yyyy")</td>
-                    <td>@item.Quantity</td>
+                    <td>
+                        <span class="badge bg-@(item.IsLowStock ? (item.Quantity <= 2 ? "danger" : "warning") : "success")">
+                            @item.Quantity units
+                        </span>
+                        @if (item.IsLowStock)
+                        {
+                            <i class="fas fa-exclamation-triangle text-@(item.Quantity <= 2 ? "danger" : "warning") ms-1"></i>
+                        }
+                    </td>
                     <td>@item.Medicine?.Price.ToString("C")</td>
                     <td>@item.UpdatedAt.ToString("MM/dd/yyyy")</td>
                 </tr>

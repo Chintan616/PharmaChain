@@ -32,10 +32,19 @@ namespace PharmaChain.Controllers
                 PendingOrders = await _context.Orders
                     .Where(o => o.CustomerID == currentUser.Id && o.Status == OrderStatus.Pending)
                     .CountAsync(),
+                LowStockItems = await _context.Inventories
+                    .Where(i => i.UserID == currentUser.Id && i.Quantity <= Models.Inventory.LOW_STOCK_THRESHOLD)
+                    .CountAsync(),
                 RecentOrders = await _context.Orders
                     .Where(o => o.CustomerID == currentUser.Id)
                     .Include(o => o.Medicine)
                     .OrderByDescending(o => o.OrderDate)
+                    .Take(5)
+                    .ToListAsync(),
+                LowStockInventory = await _context.Inventories
+                    .Where(i => i.UserID == currentUser.Id && i.Quantity <= Models.Inventory.LOW_STOCK_THRESHOLD)
+                    .Include(i => i.Medicine)
+                    .OrderBy(i => i.Quantity)
                     .Take(5)
                     .ToListAsync()
             };

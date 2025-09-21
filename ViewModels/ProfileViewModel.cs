@@ -5,7 +5,13 @@ namespace PharmaChain.ViewModels
     public class ProfileViewModel
     {
         [Display(Name = "Full Name")]
-        public string Name { get; set; } = string.Empty;
+        public string? Name { get; set; }
+
+        [Display(Name = "Company Name")]
+        public string? CompanyName { get; set; }
+        
+        [Display(Name = "Display Name")]
+        public string DisplayName { get; set; } = string.Empty;
 
         [Display(Name = "Email")]
         public string Email { get; set; } = string.Empty;

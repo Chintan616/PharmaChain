@@ -26,7 +26,8 @@ namespace PharmaChain.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-            return View();
+            var model = new RegisterViewModel();
+            return View(model);
         }
 
         [HttpPost]
@@ -38,9 +39,10 @@ namespace PharmaChain.Controllers
                 {
                     UserName = model.Email,
                     Email = model.Email,
-                    Name = model.Name,
+                    Name = model.Role == "Customer" ? model.Name : null,
+                    CompanyName = model.Role != "Customer" ? model.CompanyName : null,
                     Role = model.Role,
-                    IsApproved = model.Role == "Manufacturer" // Auto-approve manufacturers
+                    IsApproved = model.Role == "Manufacturer" || model.Role == "Admin" // Auto-approve manufacturers and admins
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
@@ -54,9 +56,14 @@ namespace PharmaChain.Controllers
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         return RedirectToAction("Index", "Manufacturer");
                     }
+                    else if (model.Role == "Admin")
+                    {
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        return RedirectToAction("Index", "Admin");
+                    }
                     else
                     {
-                        TempData["SuccessMessage"] = "Registration successful! Please wait for manufacturer approval.";
+                        TempData["SuccessMessage"] = "Registration successful! Please wait for admin approval.";
                         return RedirectToAction("Login");
                     }
                 }
@@ -73,7 +80,8 @@ namespace PharmaChain.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            return View();
+            var model = new LoginViewModel();
+            return View(model);
         }
 
         [HttpPost]
@@ -123,7 +131,9 @@ namespace PharmaChain.Controllers
             var model = new ProfileViewModel
             {
                 Name = user.Name,
-                Email = user.Email,
+                CompanyName = user.CompanyName,
+                DisplayName = user.DisplayName,
+                Email = user.Email ?? string.Empty,
                 Role = user.Role,
                 IsApproved = user.IsApproved,
                 CreatedAt = user.CreatedAt
@@ -142,9 +152,11 @@ namespace PharmaChain.Controllers
             var model = new EditProfileViewModel
             {
                 Name = user.Name,
-                Email = user.Email
+                CompanyName = user.CompanyName,
+                Email = user.Email ?? string.Empty
             };
 
+            ViewBag.UserRole = user.Role;
             return View(model);
         }
 
@@ -157,7 +169,8 @@ namespace PharmaChain.Controllers
                 var user = await _userManager.GetUserAsync(User);
                 if (user == null) return NotFound();
 
-                user.Name = model.Name;
+                user.Name = user.Role == "Customer" ? model.Name : null;
+                user.CompanyName = user.Role != "Customer" ? model.CompanyName : null;
                 user.Email = model.Email;
                 user.UserName = model.Email;
 

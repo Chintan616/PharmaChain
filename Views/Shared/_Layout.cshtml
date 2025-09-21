@@ -20,12 +20,31 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        @if (User.Identity.IsAuthenticated)
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
-                            @if (User.IsInRole("Manufacturer"))
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Admin Dashboard</a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Management
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Users">
+                                            <i class="fas fa-users"></i> Manage Users
+                                        </a></li>
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Medicines">
+                                            <i class="fas fa-pills"></i> Manage Medicines
+                                        </a></li>
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Orders">
+                                            <i class="fas fa-shopping-cart"></i> Manage Orders
+                                        </a></li>
+                                    </ul>
+                                </li>
+                            }
+                            else if (User.IsInRole("Manufacturer"))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Manufacturer" asp-action="Index">Dashboard</a>
@@ -70,7 +89,7 @@
                         }
                     </ul>
                     <ul class="navbar-nav">
-                        @if (User.Identity.IsAuthenticated)
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -79,9 +98,6 @@
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">
                                         <i class="fas fa-user"></i> View Profile
-                                    </a></li>
-                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="EditProfile">
-                                        <i class="fas fa-user-edit"></i> Edit Profile
                                     </a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>

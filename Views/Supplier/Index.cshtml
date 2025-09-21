@@ -36,17 +36,100 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card bg-success text-white">
+        <div class="card @(Model.LowStockItems > 0 ? "bg-danger" : "bg-success") text-white">
             <div class="card-body">
-                <h5 class="card-title">Quick Actions</h5>
-                <div class="d-flex gap-2">
-                    <a asp-action="BuyFromManufacturer" class="btn btn-light btn-sm">Buy Stock</a>
-                    <a asp-action="CustomerOrders" class="btn btn-light btn-sm">View Orders</a>
-                </div>
+                <h5 class="card-title">
+                    <i class="fas fa-exclamation-triangle"></i> Low Stock Items
+                </h5>
+                <h2>@Model.LowStockItems</h2>
+                @if (Model.LowStockItems > 0)
+                {
+                    <small>Items with ≤ @PharmaChain.Models.Inventory.LOW_STOCK_THRESHOLD units</small>
+                }
             </div>
         </div>
     </div>
 </div>
+
+<!-- Low Stock Alert -->
+@if (Model.LowStockItems > 0)
+{
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <h4 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle"></i> Low Stock Alert!
+                </h4>
+                <p class="mb-0">
+                    You have <strong>@Model.LowStockItems</strong> inventory item(s) with low stock (≤ @PharmaChain.Models.Inventory.LOW_STOCK_THRESHOLD units).
+                    Consider buying more stock from manufacturers to avoid stockouts.
+                </p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Low Stock Items Table -->
+@if (Model.LowStockInventory.Any())
+{
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> Low Stock Inventory
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Medicine Name</th>
+                                    <th>Current Stock</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.LowStockInventory)
+                                {
+                                    <tr class="@(item.Quantity <= 2 ? "table-danger" : "table-warning")">
+                                        <td>@item.Medicine?.Name</td>
+                                        <td>
+                                            <span class="badge bg-@(item.Quantity <= 2 ? "danger" : "warning")">
+                                                @item.Quantity units
+                                            </span>
+                                        </td>
+                                        <td>@item.Medicine?.Price.ToString("C")</td>
+                                        <td>
+                                            @if (item.Quantity <= 2)
+                                            {
+                                                <span class="badge bg-danger">Critical</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">Low</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <a asp-action="BuyFromManufacturer" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-shopping-cart"></i> Buy More
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 
 <div class="row">
     <div class="col-12">

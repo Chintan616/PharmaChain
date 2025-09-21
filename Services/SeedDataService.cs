@@ -12,7 +12,7 @@ namespace PharmaChain.Services
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
             // Create roles
-            string[] roles = { "Manufacturer", "Supplier", "Customer" };
+            string[] roles = { "Admin", "Manufacturer", "Supplier", "Customer" };
             foreach (var role in roles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
@@ -21,26 +21,27 @@ namespace PharmaChain.Services
                 }
             }
 
-            // Create default manufacturer
-            var manufacturerEmail = "admin@pharmachain.com";
-            var manufacturer = await userManager.FindByEmailAsync(manufacturerEmail);
+            // Create default admin
+            var adminEmail = "admin@pharmachain.com";
+            var admin = await userManager.FindByEmailAsync(adminEmail);
             
-            if (manufacturer == null)
+            if (admin == null)
             {
-                manufacturer = new ApplicationUser
+                admin = new ApplicationUser
                 {
-                    UserName = manufacturerEmail,
-                    Email = manufacturerEmail,
-                    Name = "System Administrator",
-                    Role = "Manufacturer",
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    Name = null,
+                    CompanyName = "PharmaChain Systems",
+                    Role = "Admin",
                     IsApproved = true,
                     EmailConfirmed = true
                 };
 
-                var result = await userManager.CreateAsync(manufacturer, "Admin@123");
+                var result = await userManager.CreateAsync(admin, "Admin@123");
                 if (result.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(manufacturer, "Manufacturer");
+                    await userManager.AddToRoleAsync(admin, "Admin");
                 }
             }
         }

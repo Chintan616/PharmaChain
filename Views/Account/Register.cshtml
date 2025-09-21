@@ -14,10 +14,16 @@
                 <form asp-action="Register" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     
-                    <div class="mb-3">
+                    <div class="mb-3" id="nameField">
                         <label asp-for="Name" class="form-label"></label>
                         <input asp-for="Name" class="form-control" />
                         <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="mb-3" id="companyField" style="display: none;">
+                        <label asp-for="CompanyName" class="form-label"></label>
+                        <input asp-for="CompanyName" class="form-control" placeholder="Enter company name" />
+                        <span asp-validation-for="CompanyName" class="text-danger"></span>
                     </div>
                     
                     <div class="mb-3">
@@ -42,9 +48,10 @@
                         <label asp-for="Role" class="form-label"></label>
                         <select asp-for="Role" class="form-select">
                             <option value="">Select Role</option>
-                            <option value="Manufacturer">Manufacturer</option>
-                            <option value="Supplier">Supplier</option>
-                            <option value="Customer">Customer</option>
+                            @foreach (var role in Model.AvailableRoles)
+                            {
+                                <option value="@role">@role</option>
+                            }
                         </select>
                         <span asp-validation-for="Role" class="text-danger"></span>
                     </div>
@@ -64,4 +71,29 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const roleSelect = document.querySelector('select[name="Role"]');
+            const nameField = document.getElementById('nameField');
+            const companyField = document.getElementById('companyField');
+            
+            function toggleFields() {
+                const selectedRole = roleSelect.value;
+                if (selectedRole === 'Customer') {
+                    nameField.style.display = 'block';
+                    companyField.style.display = 'none';
+                    document.querySelector('input[name="Name"]').required = true;
+                    document.querySelector('input[name="CompanyName"]').required = false;
+                } else {
+                    nameField.style.display = 'none';
+                    companyField.style.display = 'block';
+                    document.querySelector('input[name="Name"]').required = false;
+                    document.querySelector('input[name="CompanyName"]').required = true;
+                }
+            }
+            
+            roleSelect.addEventListener('change', toggleFields);
+            toggleFields(); // Initialize on page load
+        });
+    </script>
 }
