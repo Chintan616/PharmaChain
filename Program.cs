@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PharmaChain.Data;
 using PharmaChain.Models;
-using PharmaChain.Services;
+
 using PharmaChain.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,9 +28,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddDefaultTokenProviders();
 
 var app = builder.Build();
-
-// Seed data
-await SeedDataService.SeedAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

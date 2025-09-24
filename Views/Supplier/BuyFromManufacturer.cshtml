@@ -30,7 +30,7 @@
                     <td>@medicine.ExpiryDate.ToString("MM/dd/yyyy")</td>
                     <td>@medicine.Quantity</td>
                     <td>@medicine.Price.ToString("C")</td>
-                    <td>@medicine.Manufacturer?.Name</td>
+                    <td>@(medicine.Manufacturer != null ? (medicine.Manufacturer.DisplayName) : "-")</td>
                     <td>
                         @if (medicine.Quantity > 0)
                         {

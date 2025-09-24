@@ -79,8 +79,6 @@ PharmaChain/
 │   ├── Inventory.cs             # Inventory Management
 │   ├── Medicine.cs              # Medicine Entity
 │   └── Order.cs                 # Order Entity
-├── Services/                # Business Services
-│   └── SeedDataService.cs       # Database Seeding
 ├── ViewModels/              # View-Specific Models
 │   ├── AdminDashboardViewModel.cs
 │   ├── CustomerDashboardViewModel.cs
@@ -482,16 +480,6 @@ app.UseAuthorization();
 app.UseMiddleware<NoCacheMiddleware>();
 ```
 
-### Database Seeding
-```csharp
-// SeedDataService.cs
-public static async Task SeedAsync(IServiceProvider serviceProvider)
-{
-    // Create roles: Admin, Manufacturer, Supplier, Customer
-    // Create default admin user
-}
-```
-
 ---
 
 ## 📄 File-by-File Breakdown
@@ -503,7 +491,6 @@ public static async Task SeedAsync(IServiceProvider serviceProvider)
 - Configures Entity Framework
 - Sets up Identity services
 - Configures middleware pipeline
-- Seeds initial data
 
 #### appsettings.json
 **Purpose**: Application configuration.
@@ -601,16 +588,6 @@ public static async Task SeedAsync(IServiceProvider serviceProvider)
 - Entity relationships
 - Index configuration
 - Decimal precision settings
-
-### Services
-
-#### SeedDataService.cs
-**Lines**: 50
-**Purpose**: Database initialization.
-**Key Features**:
-- Role creation
-- Default admin user
-- Initial data setup
 
 ### ViewModels
 

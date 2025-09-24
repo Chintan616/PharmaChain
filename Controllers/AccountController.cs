@@ -50,7 +50,8 @@ namespace PharmaChain.Controllers
                     Name = model.Role == "Customer" ? model.Name : null,
                     CompanyName = model.Role != "Customer" ? model.CompanyName : null,
                     Role = model.Role,
-                    IsApproved = model.Role == "Manufacturer" // Auto-approve manufacturers only
+                    // Approval rules: Manufacturer requires admin approval, Supplier requires admin approval, Customer requires no approval
+                    IsApproved = model.Role == "Customer"
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
@@ -59,16 +60,16 @@ namespace PharmaChain.Controllers
                 {
                     await _userManager.AddToRoleAsync(user, model.Role);
                     
-                    if (model.Role == "Manufacturer")
+                    if (model.Role == "Customer")
                     {
+                        // Customers are auto-approved; sign them in
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        return RedirectToAction("Index", "Manufacturer");
+                        return RedirectToAction("Index", "Customer");
                     }
-                    else
-                    {
-                        TempData["SuccessMessage"] = "Registration successful! Please wait for admin approval.";
-                        return RedirectToAction("Login");
-                    }
+                    
+                    // Manufacturers and Suppliers require admin approval
+                    TempData["SuccessMessage"] = "Registration submitted! Please wait for admin approval.";
+                    return RedirectToAction("Login");
                 }
 
                 foreach (var error in result.Errors)

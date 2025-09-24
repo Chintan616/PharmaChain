@@ -109,8 +109,6 @@ PharmaChain/
 │   └── Supplier/         # Supplier-specific views
 ├── Data/                 # Database Context
 │   └── ApplicationDbContext.cs
-├── Services/             # Business Logic Services
-│   └── SeedDataService.cs
 ├── ViewModels/           # View Models for data binding
 └── wwwroot/             # Static files (CSS, JS, Images)
 ```
