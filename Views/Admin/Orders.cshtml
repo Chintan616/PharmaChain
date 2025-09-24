@@ -36,12 +36,12 @@
                         {
                             <tr>
                                 <td>@order.OrderID</td>
-                                <td>@order.Customer?.Name</td>
+                                <td>@order.Customer?.DisplayName</td>
                                 <td>@order.Medicine?.Name</td>
                                 <td>@order.Quantity</td>
                                 <td>@order.TotalAmount.ToString("C")</td>
                                 <td>
-                                    <span class="badge badge-@(order.Status switch {
+                                    <span class="badge bg-@(order.Status switch {
                                         OrderStatus.Delivered => "success",
                                         OrderStatus.Pending => "warning",
                                         OrderStatus.Rejected => "danger",

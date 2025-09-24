@@ -16,6 +16,13 @@ namespace PharmaChain.Controllers
             _context = context;
         }
 
+        protected void SetNoCacheHeaders()
+        {
+            Response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
+            Response.Headers.Add("Pragma", "no-cache");
+            Response.Headers.Add("Expires", "0");
+        }
+
         protected async Task<ApplicationUser?> GetCurrentUserAsync()
         {
             return await _userManager.GetUserAsync(User);

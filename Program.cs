@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PharmaChain.Data;
 using PharmaChain.Models;
 using PharmaChain.Services;
+using PharmaChain.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +47,9 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Add no-cache middleware for authenticated pages
+app.UseMiddleware<NoCacheMiddleware>();
 
 app.MapControllerRoute(
     name: "default",

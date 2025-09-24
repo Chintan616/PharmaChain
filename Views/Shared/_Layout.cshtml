@@ -25,23 +25,7 @@
                             @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Admin Dashboard</a>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle text-dark" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Management
-                                    </a>
-                                    <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Users">
-                                            <i class="fas fa-users"></i> Manage Users
-                                        </a></li>
-                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Medicines">
-                                            <i class="fas fa-pills"></i> Manage Medicines
-                                        </a></li>
-                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Orders">
-                                            <i class="fas fa-shopping-cart"></i> Manage Orders
-                                        </a></li>
-                                    </ul>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Dashboard</a>
                                 </li>
                             }
                             else if (User.IsInRole("Manufacturer"))
@@ -108,15 +92,6 @@
                                         </form>
                                     </li>
                                 </ul>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Register</a>
                             </li>
                         }
                     </ul>

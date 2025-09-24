@@ -118,109 +118,34 @@
         </div>
     </div>
 
-    <!-- Recent Activity -->
+    <!-- Quick Actions -->
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-12">
             <div class="card shadow">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Users</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
                 </div>
                 <div class="card-body">
-                    @if (Model.RecentUsers.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Role</th>
-                                        <th>Status</th>
-                                        <th>Created</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var user in Model.RecentUsers.Take(5))
-                                    {
-                                        <tr>
-                                            <td>@user.Name</td>
-                                            <td>
-                                                <span class="badge badge-@(user.Role switch {
-                                                    "Admin" => "danger",
-                                                    "Manufacturer" => "success",
-                                                    "Supplier" => "info",
-                                                    "Customer" => "warning",
-                                                    _ => "secondary"
-                                                })">@user.Role</span>
-                                            </td>
-                                            <td>
-                                                @if (user.IsApproved)
-                                                {
-                                                    <span class="badge badge-success">Approved</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge badge-warning">Pending</span>
-                                                }
-                                            </td>
-                                            <td>@user.CreatedAt.ToString("MMM dd")</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <a asp-action="Users" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-users fa-2x mb-2"></i><br>
+                                Manage Users
+                            </a>
                         </div>
-                    }
-                    else
-                    {
-                        <p class="text-muted">No recent users found.</p>
-                    }
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Orders</h6>
-                </div>
-                <div class="card-body">
-                    @if (Model.RecentOrders.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Customer</th>
-                                        <th>Medicine</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var order in Model.RecentOrders)
-                                    {
-                                        <tr>
-                                            <td>@order.Customer?.DisplayName</td>
-                                            <td>@order.Medicine?.Name</td>
-                                            <td>@order.TotalAmount.ToString("C")</td>
-                                            <td>
-                                                <span class="badge badge-@(order.Status switch {
-                                                    OrderStatus.Delivered => "success",
-                                                    OrderStatus.Pending => "warning",
-                                                    OrderStatus.Rejected => "danger",
-                                                    OrderStatus.Approved => "info",
-                                                    _ => "secondary"
-                                                })">@order.Status</span>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+                        <div class="col-md-4 mb-3">
+                            <a asp-action="Medicines" class="btn btn-success btn-lg w-100">
+                                <i class="fas fa-pills fa-2x mb-2"></i><br>
+                                Manage Medicines
+                            </a>
                         </div>
-                    }
-                    else
-                    {
-                        <p class="text-muted">No recent orders found.</p>
-                    }
+                        <div class="col-md-4 mb-3">
+                            <a asp-action="Orders" class="btn btn-info btn-lg w-100">
+                                <i class="fas fa-shopping-cart fa-2x mb-2"></i><br>
+                                Manage Orders
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
