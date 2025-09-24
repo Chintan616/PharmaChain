@@ -56,8 +56,21 @@ namespace PharmaChain.Controllers
         [HttpGet]
         public async Task<IActionResult> EditUser(string id)
         {
+            var currentUser = await GetCurrentUserAsync();
+            if (currentUser == null) return Unauthorized();
+
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return NotFound();
+
+            // Admin cannot edit themselves
+            if (currentUser.Id == user.Id)
+            {
+                TempData["ErrorMessage"] = "You cannot edit your own account.";
+                return RedirectToAction("Users");
+            }
+
+            // Get available roles (exclude Admin role for security)
+            var availableRoles = new List<string> { "Manufacturer", "Supplier", "Customer" };
 
             var model = new EditUserViewModel
             {
@@ -67,7 +80,10 @@ namespace PharmaChain.Controllers
                 Email = user.Email ?? string.Empty,
                 Role = user.Role,
                 IsApproved = user.IsApproved,
-                CreatedAt = user.CreatedAt
+                CreatedAt = user.CreatedAt,
+                AvailableRoles = availableRoles,
+                IsCurrentUser = false,
+                CanChangeRole = true
             };
 
             return View(model);
@@ -76,10 +92,31 @@ namespace PharmaChain.Controllers
         [HttpPost]
         public async Task<IActionResult> EditUser(EditUserViewModel model)
         {
+            var currentUser = await GetCurrentUserAsync();
+            if (currentUser == null) return Unauthorized();
+
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByIdAsync(model.Id);
                 if (user == null) return NotFound();
+
+                // Admin cannot edit themselves
+                if (currentUser.Id == user.Id)
+                {
+                    TempData["ErrorMessage"] = "You cannot edit your own account.";
+                    return RedirectToAction("Users");
+                }
+
+                // Prevent changing role to Admin
+                if (model.Role == "Admin")
+                {
+                    ModelState.AddModelError("Role", "You cannot assign Admin role to any user.");
+                    model.AvailableRoles = new List<string> { "Manufacturer", "Supplier", "Customer" };
+                    return View(model);
+                }
+
+                // Store original role to check if it changed
+                var originalRole = user.Role;
 
                 user.Name = model.Role == "Customer" ? model.Name : null;
                 user.CompanyName = model.Role != "Customer" ? model.CompanyName : null;
@@ -92,12 +129,15 @@ namespace PharmaChain.Controllers
                 if (result.Succeeded)
                 {
                     // Update role if changed
-                    var currentRoles = await _userManager.GetRolesAsync(user);
-                    if (currentRoles.Any())
+                    if (originalRole != model.Role)
                     {
-                        await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                        var currentRoles = await _userManager.GetRolesAsync(user);
+                        if (currentRoles.Any())
+                        {
+                            await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                        }
+                        await _userManager.AddToRoleAsync(user, model.Role);
                     }
-                    await _userManager.AddToRoleAsync(user, model.Role);
 
                     TempData["SuccessMessage"] = "User updated successfully.";
                     return RedirectToAction("Users");
@@ -109,6 +149,8 @@ namespace PharmaChain.Controllers
                 }
             }
 
+            // Re-populate available roles for the view
+            model.AvailableRoles = new List<string> { "Manufacturer", "Supplier", "Customer" };
             return View(model);
         }
 

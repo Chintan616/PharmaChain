@@ -33,6 +33,14 @@ namespace PharmaChain.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+            // Prevent admin registration
+            if (model.Role == "Admin")
+            {
+                ModelState.AddModelError("Role", "Admin registration is not allowed. Admin accounts can only be created by system administrators.");
+                model.AvailableRoles = new List<string> { "Manufacturer", "Supplier", "Customer" };
+                return View(model);
+            }
+
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser
@@ -42,7 +50,7 @@ namespace PharmaChain.Controllers
                     Name = model.Role == "Customer" ? model.Name : null,
                     CompanyName = model.Role != "Customer" ? model.CompanyName : null,
                     Role = model.Role,
-                    IsApproved = model.Role == "Manufacturer" || model.Role == "Admin" // Auto-approve manufacturers and admins
+                    IsApproved = model.Role == "Manufacturer" // Auto-approve manufacturers only
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
@@ -55,11 +63,6 @@ namespace PharmaChain.Controllers
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         return RedirectToAction("Index", "Manufacturer");
-                    }
-                    else if (model.Role == "Admin")
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return RedirectToAction("Index", "Admin");
                     }
                     else
                     {
@@ -74,6 +77,8 @@ namespace PharmaChain.Controllers
                 }
             }
 
+            // Ensure available roles are set correctly
+            model.AvailableRoles = new List<string> { "Manufacturer", "Supplier", "Customer" };
             return View(model);
         }
 

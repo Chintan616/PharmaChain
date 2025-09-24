@@ -21,22 +21,29 @@ namespace PharmaChain.Controllers
             var currentUser = await GetCurrentUserAsync();
             if (currentUser == null) return NotFound();
 
+            // Determine which medicines this supplier stocks
+            var supplierMedicineIds = await _context.Inventories
+                .Where(i => i.UserID == currentUser.Id)
+                .Select(i => i.MedicineID)
+                .ToListAsync();
+
             var dashboardData = new SupplierDashboardViewModel
             {
                 TotalInventory = await _context.Inventories
                     .Where(i => i.UserID == currentUser.Id)
                     .SumAsync(i => i.Quantity),
+                // Orders placed by customers for medicines this supplier carries
                 TotalOrders = await _context.Orders
-                    .Where(o => o.CustomerID == currentUser.Id)
+                    .Where(o => supplierMedicineIds.Contains(o.MedicineID))
                     .CountAsync(),
                 PendingOrders = await _context.Orders
-                    .Where(o => o.CustomerID == currentUser.Id && o.Status == OrderStatus.Pending)
+                    .Where(o => supplierMedicineIds.Contains(o.MedicineID) && o.Status == OrderStatus.Pending)
                     .CountAsync(),
                 LowStockItems = await _context.Inventories
                     .Where(i => i.UserID == currentUser.Id && i.Quantity <= Models.Inventory.LOW_STOCK_THRESHOLD)
                     .CountAsync(),
                 RecentOrders = await _context.Orders
-                    .Where(o => o.CustomerID == currentUser.Id)
+                    .Where(o => supplierMedicineIds.Contains(o.MedicineID))
                     .Include(o => o.Medicine)
                     .OrderByDescending(o => o.OrderDate)
                     .Take(5)

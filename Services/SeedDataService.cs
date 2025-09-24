@@ -21,27 +21,57 @@ namespace PharmaChain.Services
                 }
             }
 
-            // Create default admin
-            var adminEmail = "admin@pharmachain.com";
-            var admin = await userManager.FindByEmailAsync(adminEmail);
-            
-            if (admin == null)
+            // Create default users
+            var users = new[]
             {
-                admin = new ApplicationUser
-                {
-                    UserName = adminEmail,
-                    Email = adminEmail,
-                    Name = null,
-                    CompanyName = "PharmaChain Systems",
-                    Role = "Admin",
-                    IsApproved = true,
-                    EmailConfirmed = true
-                };
+                new { Email = "admin@pharmachain.com", Password = "Admin@123", Role = "Admin", CompanyName = "PharmaChain Systems", Name = (string?)null, IsApproved = true },
+                new { Email = "customer@pharmachain.com", Password = "Customer@123", Role = "Customer", CompanyName = (string?)null, Name = "Customer", IsApproved = true },
+                new { Email = "manufacturer@pharmachain.com", Password = "Manufacturer@123", Role = "Manufacturer", CompanyName = "Sun Pharma", Name = (string?)null, IsApproved = true },
+                new { Email = "supplier@pharmachain.com", Password = "Supplier@123", Role = "Supplier", CompanyName = "Apollo Pharmacy", Name = (string?)null, IsApproved = true }
+            };
 
-                var result = await userManager.CreateAsync(admin, "Admin@123");
-                if (result.Succeeded)
+            foreach (var userData in users)
+            {
+                var user = await userManager.FindByEmailAsync(userData.Email);
+                
+                if (user == null)
                 {
-                    await userManager.AddToRoleAsync(admin, "Admin");
+                    user = new ApplicationUser
+                    {
+                        UserName = userData.Email,
+                        Email = userData.Email,
+                        Name = userData.Name,
+                        CompanyName = userData.CompanyName,
+                        Role = userData.Role,
+                        IsApproved = userData.IsApproved,
+                        EmailConfirmed = true
+                    };
+
+                    var result = await userManager.CreateAsync(user, userData.Password);
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(user, userData.Role);
+                    }
+                }
+                else
+                {
+                    // Update existing user with proper role and approval status
+                    user.Role = userData.Role;
+                    user.IsApproved = userData.IsApproved;
+                    user.CompanyName = userData.CompanyName;
+                    user.Name = userData.Name;
+                    await userManager.UpdateAsync(user);
+                    
+                    // Ensure user is in the correct role
+                    var currentRoles = await userManager.GetRolesAsync(user);
+                    if (!currentRoles.Contains(userData.Role))
+                    {
+                        if (currentRoles.Any())
+                        {
+                            await userManager.RemoveFromRolesAsync(user, currentRoles);
+                        }
+                        await userManager.AddToRoleAsync(user, userData.Role);
+                    }
                 }
             }
         }

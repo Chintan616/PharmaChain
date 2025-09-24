@@ -24,6 +24,10 @@ namespace PharmaChain.ViewModels
 
         public DateTime CreatedAt { get; set; }
 
-        public List<string> AvailableRoles { get; set; } = new() { "Admin", "Manufacturer", "Supplier", "Customer" };
+        public List<string> AvailableRoles { get; set; } = new() { "Manufacturer", "Supplier", "Customer" };
+
+        public bool IsCurrentUser { get; set; }
+
+        public bool CanChangeRole { get; set; } = true;
     }
 }

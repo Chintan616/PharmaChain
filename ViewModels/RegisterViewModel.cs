@@ -32,6 +32,6 @@ namespace PharmaChain.ViewModels
         [Display(Name = "Role")]
         public string Role { get; set; } = string.Empty;
 
-        public List<string> AvailableRoles { get; set; } = new() { "Admin", "Manufacturer", "Supplier", "Customer" };
+        public List<string> AvailableRoles { get; set; } = new() { "Manufacturer", "Supplier", "Customer" };
     }
 }

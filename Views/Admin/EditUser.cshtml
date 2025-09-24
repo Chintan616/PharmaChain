@@ -19,6 +19,10 @@
                     <h6 class="m-0 font-weight-bold text-primary">User Information</h6>
                 </div>
                 <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Security Notice:</strong> Admin role cannot be assigned to any user. You cannot edit your own account.
+                    </div>
                     <form asp-action="EditUser" method="post">
                         <input type="hidden" asp-for="Id" />
                         <input type="hidden" asp-for="CreatedAt" />
@@ -48,12 +52,20 @@
 
                         <div class="form-group mb-3">
                             <label asp-for="Role" class="form-label">Role</label>
-                            <select asp-for="Role" class="form-control">
-                                @foreach (var role in Model.AvailableRoles)
-                                {
-                                    <option value="@role">@role</option>
-                                }
-                            </select>
+                            @if (Model.CanChangeRole)
+                            {
+                                <select asp-for="Role" class="form-control">
+                                    @foreach (var role in Model.AvailableRoles)
+                                    {
+                                        <option value="@role">@role</option>
+                                    }
+                                </select>
+                            }
+                            else
+                            {
+                                <input asp-for="Role" class="form-control" readonly />
+                                <small class="text-muted">Role cannot be changed for security reasons.</small>
+                            }
                             <span asp-validation-for="Role" class="text-danger"></span>
                         </div>
 
