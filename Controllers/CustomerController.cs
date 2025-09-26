@@ -153,17 +153,5 @@ namespace PharmaChain.Controllers
                 .ToListAsync();
             return View(orders);
         }
-
-        // Order History
-        public async Task<IActionResult> OrderHistory()
-        {
-            var currentUser = await GetCurrentUserAsync();
-            var orders = await _context.Orders
-                .Where(o => o.CustomerID == currentUser!.Id)
-                .Include(o => o.Medicine)
-                .OrderByDescending(o => o.OrderDate)
-                .ToListAsync();
-            return View(orders);
-        }
     }
 }

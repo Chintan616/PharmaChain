@@ -21,7 +21,6 @@ namespace PharmaChain.Controllers
             var currentUser = await GetCurrentUserAsync();
             if (currentUser == null) return NotFound();
 
-            // Determine which medicines this supplier stocks
             var supplierMedicineIds = await _context.Inventories
                 .Where(i => i.UserID == currentUser.Id)
                 .Select(i => i.MedicineID)
@@ -32,7 +31,6 @@ namespace PharmaChain.Controllers
                 TotalInventory = await _context.Inventories
                     .Where(i => i.UserID == currentUser.Id)
                     .SumAsync(i => i.Quantity),
-                // Orders placed by customers for medicines this supplier carries
                 TotalOrders = await _context.Orders
                     .Where(o => supplierMedicineIds.Contains(o.MedicineID))
                     .CountAsync(),
@@ -130,8 +128,6 @@ namespace PharmaChain.Controllers
         public async Task<IActionResult> CustomerOrders()
         {
             var currentUser = await GetCurrentUserAsync();
-            
-            // Get medicine IDs that this supplier has in inventory
             var supplierMedicineIds = await _context.Inventories
                 .Where(i => i.UserID == currentUser!.Id)
                 .Select(i => i.MedicineID)
@@ -160,7 +156,6 @@ namespace PharmaChain.Controllers
                 return RedirectToAction("CustomerOrders");
             }
 
-            // Check if supplier has this medicine in inventory
             var inventory = await _context.Inventories
                 .FirstOrDefaultAsync(i => i.UserID == currentUser!.Id && i.MedicineID == order.MedicineID);
 
@@ -170,11 +165,9 @@ namespace PharmaChain.Controllers
                 return RedirectToAction("CustomerOrders");
             }
 
-            // Reduce inventory
             inventory.Quantity -= order.Quantity;
             inventory.UpdatedAt = DateTime.UtcNow;
 
-            // Update order status
             order.Status = OrderStatus.Approved;
             order.ApprovedAt = DateTime.UtcNow;
 
@@ -210,7 +203,7 @@ namespace PharmaChain.Controllers
             return RedirectToAction("CustomerOrders");
         }
 
-        // View Orders
+        // View Orders for Supplier as Customer
         public async Task<IActionResult> Orders()
         {
             var currentUser = await GetCurrentUserAsync();
@@ -221,5 +214,30 @@ namespace PharmaChain.Controllers
                 .ToListAsync();
             return View(orders);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteInventory(int id)
+        {
+            var inventory = await _context.Inventories
+                .Include(i => i.Medicine)
+                .FirstOrDefaultAsync(i => i.InventoryID == id);
+
+            if (inventory != null)
+            {
+                if (inventory.Quantity <= 0)
+                {
+                    TempData["ErrorMessage"] = "Cannot delete inventory with zero quantity.";
+                    return RedirectToAction("Inventory");
+                }
+
+                _context.Inventories.Remove(inventory);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Inventory deleted successfully.";
+            }
+
+            return RedirectToAction("Inventory");
+        }
+
     }
 }

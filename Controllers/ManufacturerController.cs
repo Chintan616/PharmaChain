@@ -68,7 +68,7 @@ namespace PharmaChain.Controllers
 
             // Get users who are either customers or suppliers and are relevant to this manufacturer
             var users = await _context.Users
-                .Where(u => allRelevantUserIds.Contains(u.Id) && 
+                .Where(u => allRelevantUserIds.Contains(u.Id) &&
                            (u.Role == "Customer" || u.Role == "Supplier"))
                 .OrderBy(u => u.Role)
                 .ThenBy(u => u.CreatedAt)
@@ -223,6 +223,18 @@ namespace PharmaChain.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteMedicine(int id)
         {
+            // Check if any orders exist with this medicine
+            bool hasOrders = await _context.Orders.AnyAsync(o => o.MedicineID == id);
+
+            // Check if any inventory exists with this medicine
+            bool hasInventories = await _context.Inventories.AnyAsync(i => i.MedicineID == id);
+
+            if (hasOrders || hasInventories)
+            {
+                TempData["ErrorMessage"] = "Cannot delete medicine. There are orders or inventories associated with this medicine.";
+                return RedirectToAction("Medicines");
+            }
+
             var medicine = await _context.Medicines.FindAsync(id);
             if (medicine != null)
             {
@@ -230,8 +242,10 @@ namespace PharmaChain.Controllers
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Medicine deleted successfully.";
             }
+
             return RedirectToAction("Medicines");
         }
+
 
         // Order Management
         public async Task<IActionResult> Orders()

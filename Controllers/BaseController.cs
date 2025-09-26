@@ -22,18 +22,18 @@ namespace PharmaChain.Controllers
             Response.Headers.Add("Pragma", "no-cache");
             Response.Headers.Add("Expires", "0");
         }
-
+        //get current user
         protected async Task<ApplicationUser?> GetCurrentUserAsync()
         {
             return await _userManager.GetUserAsync(User);
         }
-
+        //check role
         protected async Task<bool> IsInRoleAsync(string role)
         {
             var user = await GetCurrentUserAsync();
             return user != null && await _userManager.IsInRoleAsync(user, role);
         }
-
+        //check if user is approved
         protected async Task<bool> IsApprovedAsync()
         {
             var user = await GetCurrentUserAsync();

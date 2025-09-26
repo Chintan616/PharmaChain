@@ -32,14 +32,26 @@ namespace PharmaChain.ViewModels
         [DataType(DataType.Currency)]
         public decimal Price { get; set; }
 
-        [Required]
+
         [StringLength(100)]
         [Display(Name = "Manufacturer Name")]
         public string ManufacturerName { get; set; } = string.Empty;
 
-        [Required]
+
         [StringLength(100)]
         [Display(Name = "Supplier Name")]
         public string SupplierName { get; set; } = string.Empty;
+        
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (ExpiryDate.Date < DateTime.UtcNow.Date)
+            {
+                yield return new ValidationResult(
+                    "Expiry date cannot be before today.",
+                    new[] { nameof(ExpiryDate) });
+            }
+        }
     }
 }
+    
+

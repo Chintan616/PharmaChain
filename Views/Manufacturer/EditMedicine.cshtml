@@ -14,7 +14,7 @@
                 <form asp-action="EditMedicine" method="post">
                     <input asp-for="MedicineID" type="hidden" />
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -31,12 +31,13 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label asp-for="ExpiryDate" class="form-label"></label>
-                                <input asp-for="ExpiryDate" class="form-control" type="date" />
+                                <input asp-for="ExpiryDate" class="form-control" type="date"
+                                    min="@DateTime.UtcNow.ToString("yyyy-MM-dd")" />
                                 <span asp-validation-for="ExpiryDate" class="text-danger"></span>
                             </div>
                         </div>
@@ -48,13 +49,13 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label asp-for="Price" class="form-label"></label>
                         <input asp-for="Price" class="form-control" type="number" step="0.01" min="0.01" />
                         <span asp-validation-for="Price" class="text-danger"></span>
                     </div>
-                    
+
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">Update Medicine</button>
                         <a asp-action="Medicines" class="btn btn-secondary">Cancel</a>
@@ -66,5 +67,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
