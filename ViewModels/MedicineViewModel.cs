@@ -31,5 +31,15 @@ namespace PharmaChain.ViewModels
         [Display(Name = "Price")]
         [DataType(DataType.Currency)]
         public decimal Price { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        [Display(Name = "Manufacturer Name")]
+        public string ManufacturerName { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(100)]
+        [Display(Name = "Supplier Name")]
+        public string SupplierName { get; set; } = string.Empty;
     }
 }

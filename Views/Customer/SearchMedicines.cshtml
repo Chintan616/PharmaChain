@@ -22,24 +22,32 @@
     </div>
 </div>
 
-@if (Model.Medicines.Any())
+@if (Model.Results.Any())
 {
     <div class="row">
-        @foreach (var medicine in Model.Medicines)
+        @foreach (var item in Model.Results)
         {
             <div class="col-md-4 mb-4">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">@medicine.Name</h5>
+                        <h5 class="card-title">@item.Medicine?.Name</h5>
                         <p class="card-text">
-                            <strong>Batch No:</strong> @medicine.BatchNo<br>
-                            <strong>Expiry Date:</strong> @medicine.ExpiryDate.ToString("MM/dd/yyyy")<br>
-                            <strong>Price:</strong> @medicine.Price.ToString("C")<br>
-                            <strong>Manufacturer:</strong> @medicine.Manufacturer.CompanyName<br>
-                            @* <strong>Available from:</strong> <span class="text-success"></span> *@
+                            <strong>Batch No:</strong> @item.Medicine?.BatchNo<br>
+                            <strong>Expiry Date:</strong> @(item.Medicine != null ? item.Medicine.ExpiryDate.ToString("MM/dd/yyyy") : "")<br>
+                            <strong>Price:</strong> @(item.Medicine != null ? item.Medicine.Price.ToString("C") : "")<br>
+                            <strong>Manufacturer:</strong> @item.Medicine?.Manufacturer?.CompanyName<br>
+                            <strong>Suppliers:</strong>
+                            @if (item.SupplierNames != null && item.SupplierNames.Any())
+                            {
+                                <span>@string.Join(", ", item.SupplierNames)</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">No supplier listed</span>
+                            }
                         </p>
                         <form asp-action="PlaceOrder" method="post" class="d-inline">
-                            <input type="hidden" name="medicineId" value="@medicine.MedicineID" />
+                            <input type="hidden" name="medicineId" value="@(item.Medicine != null ? item.Medicine.MedicineID : 0)" />
                             <div class="input-group mb-2">
                                 <input type="number" name="quantity" class="form-control" min="1" value="1" placeholder="Quantity" />
                                 <button type="submit" class="btn btn-primary">Place Order</button>

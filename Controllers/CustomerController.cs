@@ -46,23 +46,57 @@ namespace PharmaChain.Controllers
         // Search Medicines from Suppliers
         public async Task<IActionResult> SearchMedicines(string searchTerm = "")
         {
-            // Get medicines that are available in supplier inventories
-            var medicines = await _context.Inventories
-                .Where(i => i.Quantity > 0)
-                .Include(i => i.Medicine)
-                .ThenInclude(m => m!.Manufacturer)
-                .Where(i => string.IsNullOrEmpty(searchTerm) || 
-                           (i.Medicine != null && i.Medicine.Name.Contains(searchTerm)) || 
-                           (i.Medicine != null && i.Medicine.BatchNo.Contains(searchTerm)))
-                .Select(i => i.Medicine)
-                .Where(m => m != null)
-                .Distinct()
+            // Get medicines available in supplier inventories along with supplier names
+            var inventoryQuery = _context.Inventories
+                .Where(i => i.Quantity > 0);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                inventoryQuery = inventoryQuery.Where(i =>
+                    (i.Medicine != null && i.Medicine.Name.Contains(searchTerm)) ||
+                    (i.Medicine != null && i.Medicine.BatchNo.Contains(searchTerm)));
+            }
+
+            // Materialize and group in memory to avoid EF translation issues with GroupBy on entities
+            var inventoryItems = await inventoryQuery
+                .Where(i => i.Medicine != null && i.User != null)
+                .Select(i => new
+                {
+                    Medicine = i.Medicine!,
+                    Manufacturer = i.Medicine!.Manufacturer,
+                    Supplier = i.User!
+                })
                 .ToListAsync();
+
+            var grouped = inventoryItems
+                .GroupBy(x => x.Medicine.MedicineID)
+                .Select(g => new MedicineSuppliersViewModel
+                {
+                    Medicine = g.Select(x => x.Medicine).First(),
+                    SupplierNames = g
+                        .Where(x => x.Supplier.Role == "Supplier")
+                        .Select(x => x.Supplier.CompanyName ?? x.Supplier.Email ?? "Unknown")
+                        .Distinct()
+                        .OrderBy(name => name)
+                        .ToList()
+                })
+                .OrderBy(r => r.Medicine.Name)
+                .ToList();
+
+            // Ensure manufacturer is loaded for each medicine
+            foreach (var item in grouped)
+            {
+                if (item.Medicine.Manufacturer == null)
+                {
+                    var firstInventory = inventoryItems.First(x => x.Medicine.MedicineID == item.Medicine.MedicineID);
+                    item.Medicine.Manufacturer = firstInventory.Manufacturer;
+                }
+            }
 
             var model = new SearchMedicinesViewModel
             {
                 SearchTerm = searchTerm,
-                Medicines = medicines!
+                Results = grouped
             };
 
             return View(model);
