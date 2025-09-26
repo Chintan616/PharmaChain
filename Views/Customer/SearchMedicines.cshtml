@@ -35,8 +35,8 @@
                             <strong>Batch No:</strong> @medicine.BatchNo<br>
                             <strong>Expiry Date:</strong> @medicine.ExpiryDate.ToString("MM/dd/yyyy")<br>
                             <strong>Price:</strong> @medicine.Price.ToString("C")<br>
-                            <strong>Manufacturer:</strong> @medicine.Manufacturer?.Name<br>
-                            <strong>Available from:</strong> <span class="text-success">Suppliers</span>
+                            <strong>Manufacturer:</strong> @medicine.Manufacturer.CompanyName<br>
+                            @* <strong>Available from:</strong> <span class="text-success"></span> *@
                         </p>
                         <form asp-action="PlaceOrder" method="post" class="d-inline">
                             <input type="hidden" name="medicineId" value="@medicine.MedicineID" />
