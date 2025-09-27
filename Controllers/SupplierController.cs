@@ -126,21 +126,25 @@ namespace PharmaChain.Controllers
 
         // View Orders from Customers
         public async Task<IActionResult> CustomerOrders()
-        {
-            var currentUser = await GetCurrentUserAsync();
-            var supplierMedicineIds = await _context.Inventories
-                .Where(i => i.UserID == currentUser!.Id)
-                .Select(i => i.MedicineID)
-                .ToListAsync();
+{
+    var currentUser = await GetCurrentUserAsync();
 
-            var orders = await _context.Orders
-                .Where(o => supplierMedicineIds.Contains(o.MedicineID))
-                .Include(o => o.Customer)
-                .Include(o => o.Medicine)
-                .OrderByDescending(o => o.OrderDate)
-                .ToListAsync();
-            return View(orders);
-        }
+    // Get all medicine IDs that belong to this supplier
+    var supplierMedicineIds = await _context.Inventories
+        .Where(i => i.UserID == currentUser!.Id)
+        .Select(i => i.MedicineID)
+        .ToListAsync();
+
+    // Get orders only for the supplier's medicines
+    var orders = await _context.Orders
+        .Where(o => supplierMedicineIds.Contains(o.MedicineID))
+        .Include(o => o.Medicine)  // Include medicine details
+        .Include(o => o.Customer)  // Include customer details (optional if needed)
+        .OrderByDescending(o => o.OrderDate)
+        .ToListAsync();
+
+    return View(orders);
+}
 
         [HttpPost]
         public async Task<IActionResult> ApproveOrder(int orderId)

@@ -26,7 +26,7 @@ namespace PharmaChain.Data
 
             // Create default admin user
             var adminEmail = "admin@pharmachain.com";
-            var adminPassword = "Admin@123"; // ✅ change to a stronger password for production
+            var adminPassword = "Admin@123"; 
 
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
             if (adminUser == null)
