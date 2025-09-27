@@ -92,33 +92,38 @@ namespace PharmaChain.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
+{
+    if (ModelState.IsValid)
+    {
+        var user = await _userManager.FindByEmailAsync(model.Email);
+        if (user != null)
         {
-            if (ModelState.IsValid)
+            // Check password first
+            var result = await _signInManager.PasswordSignInAsync(
+                model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+
+            if (result.Succeeded)
             {
-                var result = await _signInManager.PasswordSignInAsync(
-                    model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-
-                if (result.Succeeded)
+                // Admin bypasses approval
+                if (user.Role == "Admin" || user.IsApproved)
                 {
-                    var user = await _userManager.FindByEmailAsync(model.Email);
-                    
-                    if (user != null && user.IsApproved)
-                    {
-                        return RedirectToAction("Index", user.Role);
-                    }
-                    else if (user != null && !user.IsApproved)
-                    {
-                        await _signInManager.SignOutAsync();
-                        TempData["ErrorMessage"] = "Your account is pending approval from the manufacturer.";
-                        return View(model);
-                    }
+                    return RedirectToAction("Index", user.Role);
                 }
-
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                else
+                {
+                    await _signInManager.SignOutAsync();
+                    TempData["ErrorMessage"] = "Your account is pending approval from the manufacturer.";
+                    return View(model);
+                }
             }
-
-            return View(model);
         }
+
+        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+    }
+
+    return View(model);
+}
+
 
         [HttpPost]
         public async Task<IActionResult> Logout()
