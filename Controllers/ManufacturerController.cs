@@ -77,66 +77,6 @@ namespace PharmaChain.Controllers
             return View(users);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ApproveUser(string userId)
-        {
-            var currentUser = await GetCurrentUserAsync();
-            if (currentUser == null) return NotFound();
-
-            // Verify the user is related to this manufacturer's business
-            var isRelatedUser = await IsUserRelatedToManufacturer(userId, currentUser.Id);
-            if (!isRelatedUser)
-            {
-                TempData["ErrorMessage"] = "You can only manage users related to your medicines.";
-                return RedirectToAction("Users");
-            }
-
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user != null)
-            {
-                user.IsApproved = true;
-                await _userManager.UpdateAsync(user);
-                TempData["SuccessMessage"] = "User approved successfully.";
-            }
-            return RedirectToAction("Users");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> RejectUser(string userId)
-        {
-            var currentUser = await GetCurrentUserAsync();
-            if (currentUser == null) return NotFound();
-
-            // Verify the user is related to this manufacturer's business
-            var isRelatedUser = await IsUserRelatedToManufacturer(userId, currentUser.Id);
-            if (!isRelatedUser)
-            {
-                TempData["ErrorMessage"] = "You can only manage users related to your medicines.";
-                return RedirectToAction("Users");
-            }
-
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user != null)
-            {
-                await _userManager.DeleteAsync(user);
-                TempData["SuccessMessage"] = "User rejected and deleted.";
-            }
-            return RedirectToAction("Users");
-        }
-
-        private async Task<bool> IsUserRelatedToManufacturer(string userId, string manufacturerId)
-        {
-            // Check if user is a customer who ordered medicines from this manufacturer
-            var isCustomer = await _context.Orders
-                .AnyAsync(o => o.CustomerID == userId && o.Medicine.ManufacturerID == manufacturerId);
-
-            // Check if user is a supplier who has inventory of medicines from this manufacturer
-            var isSupplier = await _context.Inventories
-                .AnyAsync(i => i.UserID == userId && i.Medicine.ManufacturerID == manufacturerId);
-
-            return isCustomer || isSupplier;
-        }
-
         // Medicine Management
         public async Task<IActionResult> Medicines()
         {
@@ -256,47 +196,6 @@ namespace PharmaChain.Controllers
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
             return View(orders);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ApproveOrder(int orderId)
-        {
-            var order = await _context.Orders.FindAsync(orderId);
-            if (order != null)
-            {
-                order.Status = OrderStatus.Approved;
-                order.ApprovedAt = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Order approved successfully.";
-            }
-            return RedirectToAction("Orders");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> RejectOrder(int orderId)
-        {
-            var order = await _context.Orders.FindAsync(orderId);
-            if (order != null)
-            {
-                order.Status = OrderStatus.Rejected;
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Order rejected successfully.";
-            }
-            return RedirectToAction("Orders");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> MarkAsDelivered(int orderId)
-        {
-            var order = await _context.Orders.FindAsync(orderId);
-            if (order != null)
-            {
-                order.Status = OrderStatus.Delivered;
-                order.DeliveredAt = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Order marked as delivered successfully.";
-            }
-            return RedirectToAction("Orders");
         }
     }
 }

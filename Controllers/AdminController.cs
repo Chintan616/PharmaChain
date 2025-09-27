@@ -28,16 +28,6 @@ namespace PharmaChain.Controllers
                 ManufacturerUsers = await _context.Users.CountAsync(u => u.Role == "Manufacturer"),
                 SupplierUsers = await _context.Users.CountAsync(u => u.Role == "Supplier"),
                 CustomerUsers = await _context.Users.CountAsync(u => u.Role == "Customer"),
-                // RecentUsers = await _context.Users
-                //     .OrderByDescending(u => u.CreatedAt)
-                //     .Take(10)
-                //     .ToListAsync(),
-                // RecentOrders = await _context.Orders
-                //     .Include(o => o.Customer)
-                //     .Include(o => o.Medicine)
-                //     .OrderByDescending(o => o.OrderDate)
-                //     .Take(5)
-                //     .ToListAsync()
             };
 
             return View(dashboardData);
